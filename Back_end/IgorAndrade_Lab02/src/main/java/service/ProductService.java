@@ -1,8 +1,12 @@
 package service;
 
+import java.util.List;
+
 import org.springframework.stereotype.Service;
+import org.springframework.web.bind.annotation.RequestBody;
 
 import dao.ProductDAO;
+import exception.ProductNotFoundException;
 import model.Product;
 
 @Service
@@ -26,6 +30,33 @@ public class ProductService {
 		}
 		
 		return this.productDAO.save(productToUpdate);
+	}
+	
+	public Product partialUpdate(@RequestBody Product product) throws ProductNotFoundException {
+		Product p = this.productDAO.findById(product.getId());
+		
+		if(p == null) {
+			throw new ProductNotFoundException("Produto não encontrado");
+			
+		}
+		
+		if(product.getName() != null) {
+			p.setName(product.getName());
+		}
+		
+		if(product.getDescription() != null) {
+			p.setDescription(product.getDescription());
+		}
+		
+		if(product.getPrice() > 0) {
+			p.setPrice(product.getPrice());
+		}
+		
+		return this.productDAO.save(p);
+	}
+	
+	public List<Product> getAll(){
+		return this.productDAO.findAll();
 	}
 	
 	public void delete(long id) {
